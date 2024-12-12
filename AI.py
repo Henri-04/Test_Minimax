@@ -20,6 +20,7 @@ def generer_coups(joueur_actuel, etats_systeme):
         if case[1] in (1, 2):  # Vérifie si case[1] est dans la liste [1, 2]
             nb_pions_total += 1
     #TEST
+    print("Pions sur le plateau :")
     print(nb_pions_total)
 
     #Calcul du nombre de pions du joueur actuel
@@ -29,7 +30,9 @@ def generer_coups(joueur_actuel, etats_systeme):
         if case[1] == joueur_actuel:
             nb_pions_joueur_actuel += 1
     #TEST
+    print("Nb de pions du MAXIMISEUR :")
     print(nb_pions_joueur_actuel)
+
 
 
     #Generation des coups de type "poser un pion"
@@ -198,24 +201,6 @@ def generer_coups(joueur_actuel, etats_systeme):
 
 
 
-
-
-
-
-
-
-"""
-    # Étape 1 : Identifier les pions
-    pions = [case for case in etats_systeme if case[1] == 1 or case[1] == 2]
-
-    # Étape 2 : Identifier les cases vides
-    cases_jouables = [case for case in etats_systeme if case[1] == 0]
-"""
-
-
-
-
-
 ##################################################
 
 def check_victory(etats_systeme, joueur):
@@ -249,6 +234,7 @@ def check_victory(etats_systeme, joueur):
 
     return False
 
+
 def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
     """
     Implémente l'algorithme Minimax avec élagage alpha-bêta.
@@ -269,130 +255,48 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
         return 1, None
     if check_victory(etats_systeme, joueur_adverse):  # Victoire de l'adversaire
         return -1, None
-    if all(case[1] != 0 for case in etats_systeme):  # Pas de coup possible (match nul)
-        return 0, None
+
 
     # Étape 2 : Initialisation des variables
     best_move = None
-    if is_maximizing:
+    if is_maximizing: #si c'est au maxeur de gagner
         best_score = float('-inf')
     else:
         best_score = float('inf')
 
+
     # Étape 3 : Générer tous les coups possibles
-    possible_moves = generer_coups(joueur if is_maximizing else joueur_adverse, etats_systeme)
+    possible_moves = generer_coups(joueur, etats_systeme)
 
     # Étape 4 : Parcourir les coups possibles
     for move in possible_moves:
-        # Simuler le coup
-        etats_systeme = apply_move(etats_systeme, move)
+
 
         # Appel récursif avec l'état modifié
-        score, _ = minimax(
-            etats_systeme,
-            not is_maximizing,
-            joueur,
-            joueur_adverse,
-            alpha,
-            beta
-        )
+
+        score,_  = minimax(move, False, joueur, joueur_adverse, alpha, beta)
 
         # Annuler le coup (backtracking)
-        etats_systeme = undo_move(etats_systeme, move)
+
+        #etats_systeme = undo_move(etats_systeme, move)
 
         # Mettre à jour le meilleur score et coup selon le type de joueur
-        if is_maximizing:
+
+        if is_maximizing:#quand c'est au maxeur de jouer
             if score > best_score:
                 best_score = score
                 best_move = move
-            alpha = max(alpha, best_score)
+            #alpha = max(alpha, best_score)
         else:
             if score < best_score:
                 best_score = score
                 best_move = move
-            beta = min(beta, best_score)
+            #beta = min(beta, best_score)
 
         # Élagage alpha-bêta
-        if beta <= alpha:
-            break
+        #if beta <= alpha:
+        #    break
 
     # Étape 5 : Retourner le meilleur score et coup
     return best_score, best_move
 
-
-
-# Exemple des fonctions utilitaires utilisées ci-dessus
-
-
-#######################################
-
-# Modification de la fonction apply_move
-def apply_move(etats_systeme, move):
-    """
-    Applique un coup à l'état du système et enregistre les informations nécessaires pour annuler ce coup.
-
-    :param etats_systeme: Liste représentant l'état du système.
-    :param move: Coup à appliquer.
-    :return: État du système modifié.
-    """
-    # Enregistrer l'état de la case avant le coup
-    case = next((case for case in etats_systeme if case[0] == move['id_case']), None)
-    if case:
-        move['previous_state'] = case[1]  # Enregistre l'état précédent de la case
-        move['previous_coords'] = case[0]  # Enregistre les coordonnées de la case avant le déplacement
-
-    # Appliquer le coup, par exemple poser un pion ou déplacer une case
-    if move['type'] == 'poser_pion':
-        case[1] = move['new_state']  # Le nouvel état de la case (pion posé)
-
-    elif move['type'] == 'deplacer_pion':
-        source_case = next((case for case in etats_systeme if case[0] == move['source_case_id']), None)
-        target_case = next((case for case in etats_systeme if case[0] == move['id_case']), None)
-
-        if source_case and target_case:
-            # Appliquer le déplacement du pion
-            source_case[1] = 0  # La case source devient vide
-            target_case[1] = move['new_state']  # Le pion est déplacé vers la case cible
-
-    elif move['type'] == 'deplacer_case':
-        case = next((case for case in etats_systeme if case[0] == move['id_case']), None)
-        if case:
-            # Appliquer le déplacement de la case
-            case[0] = move['new_coords']  # Met à jour les coordonnées de la case
-
-    # Retourner l'état modifié
-    return etats_systeme
-
-
-#############################################
-
-# Modification de la fonction undo_move
-def undo_move(etats_systeme, move):
-    """
-    Annule un coup sur l'état du système en utilisant les informations stockées.
-
-    :param etats_systeme: Liste représentant l'état du système.
-    :param move: Coup à annuler.
-    :return: État du système restauré.
-    """
-    case = next((case for case in etats_systeme if case[0] == move['id_case']), None)
-    if case:
-        # Restaurer l'état de la case à son état précédent
-        case[1] = move['previous_state']  # Restaure l'état original de la case
-
-        # Si le coup était un "déplacement de pion", annuler le mouvement
-        if move['type'] == 'deplacer_pion':
-            source_case = next((case for case in etats_systeme if case[0] == move['source_case_id']), None)
-            target_case = next((case for case in etats_systeme if case[0] == move['id_case']), None)
-
-            if source_case and target_case:
-                # Restaure la case source et la case cible
-                source_case[1] = move['new_state']  # Restaure l'état du pion sur la case source
-                target_case[1] = 0  # La case cible devient vide
-
-        # Si le coup était un "déplacement de case", annuler le déplacement
-        elif move['type'] == 'deplacer_case':
-            case[0] = move['previous_coords']  # Restaure les coordonnées d'origine de la case déplacée
-
-    # Retourner l'état restauré
-    return etats_systeme

@@ -1,23 +1,39 @@
 from AI import *
 
 etats_systeme = [
-    [0, 0], [1, 0], [2, 0], [3, 0],
+    [0, 1], [1, 1], [2, 0], [3, 0],
     [4, 3], [5, 0], [6, 0], [7, 0],
     [8, 0]
 ]
 
+compteur = 0
+
+alpha = 1
+beta = 1
+
+#etats_systeme = generer_coups(1, etats_systeme)
+
+#print (etats_systeme)
+#print(len(etats_systeme))
+
+#Appel de Minimax
 
 
-#coups_possibles = generer_coups(1, etats_systeme)
-#print(coups_possibles)
+score, best_move = minimax(etats_systeme, True, 1, 2, alpha, beta)
+
+
+
+print("\nScore attribué à la situation finale :")
+print(score)
+print("\n")
+
+print("Etat du plateau après avoir effectué le meilleur coup :\n ")
+print(best_move)
 
 
 
 
 
-
-print(pions)
-print(cases_vides_et_jouables)
 
 
 """
@@ -25,12 +41,10 @@ print(cases_vides_et_jouables)
 is_maximizing = True
 alpha = float('-inf')
 beta = float('inf')
-profondeur = 3
+
 # Exemple de profondeur
 
-
 # Appel de minimax pour déterminer le meilleur coup
-score, best_move = minimax(etats_systeme, True, 2, 1, alpha, beta)
 
 print(f"Le meilleur coup à jouer est : {best_move}")
 
