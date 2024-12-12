@@ -20,8 +20,8 @@ def generer_coups(joueur_actuel, etats_systeme):
         if case[1] in (1, 2):  # Vérifie si case[1] est dans la liste [1, 2]
             nb_pions_total += 1
     #TEST
-    print("Pions sur le plateau :")
-    print(nb_pions_total)
+    #print("Pions sur le plateau :")
+    #print(nb_pions_total)
 
     #Calcul du nombre de pions du joueur actuel
     nb_pions_joueur_actuel = 0
@@ -30,8 +30,8 @@ def generer_coups(joueur_actuel, etats_systeme):
         if case[1] == joueur_actuel:
             nb_pions_joueur_actuel += 1
     #TEST
-    print("Nb de pions du MAXIMISEUR :")
-    print(nb_pions_joueur_actuel)
+    #print("Nb de pions du MAXIMISEUR :")
+    #print(nb_pions_joueur_actuel)
 
 
 
@@ -212,24 +212,23 @@ def check_victory(etats_systeme, joueur):
     :param joueur: Identifiant du joueur à vérifier (1 ou 2).
     :return: True si le joueur a gagné, False sinon.
     """
-    # Supposons que le plateau soit 3x3 ou autre format, chaque ligne étant dans l'état du système
     # Transformation en tableau 2D basé sur l'état du système
-    plateau = [etats_systeme[i:i + 3] for i in range(0, len(etats_systeme), 3)]
+    plateau = [[etats_systeme[i * 3 + j][1] for j in range(3)] for i in range(3)]
 
     # Vérification des lignes
     for row in plateau:
-        if all(cell[1] == joueur for cell in row):
+        if all(cell == joueur for cell in row):
             return True
 
     # Vérification des colonnes
     for col in range(3):
-        if all(plateau[row][col][1] == joueur for row in range(3)):
+        if all(plateau[row][col] == joueur for row in range(3)):
             return True
 
     # Vérification des diagonales
-    if all(plateau[i][i][1] == joueur for i in range(3)):  # Diagonale principale
+    if all(plateau[i][i] == joueur for i in range(3)):  # Diagonale principale
         return True
-    if all(plateau[i][2 - i][1] == joueur for i in range(3)):  # Diagonale secondaire
+    if all(plateau[i][2 - i] == joueur for i in range(3)):  # Diagonale secondaire
         return True
 
     return False
@@ -255,6 +254,9 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
         return 1, None
     if check_victory(etats_systeme, joueur_adverse):  # Victoire de l'adversaire
         return -1, None
+    #if all(case[1] != 0 for case in etats_systeme):  # Pas de coup possible (match nul)
+     #   return 0, None
+
 
 
     # Étape 2 : Initialisation des variables
@@ -263,6 +265,10 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
         best_score = float('-inf')
     else:
         best_score = float('inf')
+
+
+
+
 
 
     # Étape 3 : Générer tous les coups possibles
@@ -274,6 +280,7 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
 
         # Appel récursif avec l'état modifié
 
+        print("I'm running bro")
         score,_  = minimax(move, False, joueur, joueur_adverse, alpha, beta)
 
         # Annuler le coup (backtracking)
@@ -299,4 +306,3 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
 
     # Étape 5 : Retourner le meilleur score et coup
     return best_score, best_move
-
