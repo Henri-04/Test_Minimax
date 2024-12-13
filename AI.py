@@ -1,4 +1,4 @@
-
+#Code PROTOTYPE
 
 def generer_coups(joueur_actuel, etats_systeme):
     """
@@ -234,7 +234,7 @@ def check_victory(etats_systeme, joueur):
     return False
 
 
-def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
+def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse):
     """
     Implémente l'algorithme Minimax avec élagage alpha-bêta.
 
@@ -254,6 +254,8 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
         return 1, None
     if check_victory(etats_systeme, joueur_adverse):  # Victoire de l'adversaire
         return -1, None
+
+
     #if all(case[1] != 0 for case in etats_systeme):  # Pas de coup possible (match nul)
      #   return 0, None
 
@@ -262,17 +264,30 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
     # Étape 2 : Initialisation des variables
     best_move = None
     if is_maximizing: #si c'est au maxeur de gagner
+
+
         best_score = float('-inf')
+
+        #Générer tous les coups possibles
+        possible_moves = generer_coups(joueur, etats_systeme)
+
+        for possible_move in possible_moves:
+
+            minimax(possible_move, not is_maximizing, joueur, joueur_adverse)
+
+
+
+
+
+
+
+
+
     else:
         best_score = float('inf')
 
 
 
-
-
-
-    # Étape 3 : Générer tous les coups possibles
-    possible_moves = generer_coups(joueur, etats_systeme)
 
     # Étape 4 : Parcourir les coups possibles
     for move in possible_moves:
@@ -281,9 +296,8 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
         # Appel récursif avec l'état modifié
 
         print("I'm running bro")
-        score,_  = minimax(move, False, joueur, joueur_adverse, alpha, beta)
+        score,_  = minimax(move, not is_maximizing, joueur_adverse, joueur)
 
-        # Annuler le coup (backtracking)
 
         #etats_systeme = undo_move(etats_systeme, move)
 
@@ -306,3 +320,4 @@ def minimax(etats_systeme, is_maximizing, joueur, joueur_adverse, alpha, beta):
 
     # Étape 5 : Retourner le meilleur score et coup
     return best_score, best_move
+
